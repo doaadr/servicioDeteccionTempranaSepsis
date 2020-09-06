@@ -1,0 +1,13 @@
+##=========================================
+## Configuración GUIA
+##=========================================
+## URL del servicio GUIA 
+##URL_GUIA=https://webapps-pre.salud.psis/guiaws.php
+
+## URL del servicio INFOUSER
+URL_GUIA_INFOUSER=http://webapps-pre.salud.psis/guiaws.php?s=infoUser&nif=
+
+## URL del servicio VALIDATETOKEN
+##URL_GUIA_VALIDATETOKEN=http://webapps-pre.salud.psis/guiaws.php?s=validateToken
+
+URL_KODIFIKA=http://mev-kodifika-01.aragon.local/KodifikaServicesHostExternos

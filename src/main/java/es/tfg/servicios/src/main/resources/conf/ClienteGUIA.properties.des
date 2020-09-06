@@ -1,0 +1,23 @@
+##=========================================
+## Configuración GUIA
+##=========================================
+## Parámetro que define si se usa GUIA o RHAPGUIA
+GUIA_ACTIVO=RHAPGUIA
+
+## Timeout para las conexiones a GUIA
+GUIA_TIMEOUT=15
+
+## Configuración de operaciones GUIA
+GUIA_OP_AUTHGUIA=authGuia
+GUIA_OP_INFOUSER=infoUser
+GUIA_OP_GETTOKEN=getToken
+GUIA_OP_VALIDATETOKEN=validateToken
+
+## URLs del servicio GUIA 
+GUIA_URL=https://webapps-pre.salud.psis/guiaws.php
+
+## URLs del servicio RHAPGUIA 
+RHAPGUIA_URL=https://rhapguiapre.salud.aragon.es/guiaws.php
+##RHAPGUIA_URL=https://psisiti002.salud.psis/guiaws.php
+##RHAPGUIA_URL=https://psisitd007.salud.psis:3224/guiaws.php
+

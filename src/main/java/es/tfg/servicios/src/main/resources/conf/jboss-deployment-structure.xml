@@ -1,0 +1,50 @@
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+	<sub-deployment name="hceservice.war">
+		<exclude-subsystems>
+            <subsystem name="webservices"/> <!-- Excluimos el subsistema "webservices" para eliminar dependencias con la version CXF de JBOSS -->
+            <subsystem name="jaxrs"/> <!-- Excluimos el subsistema "jaxrs" para eliminar dependencias con la version JAX-RS API de JBOSS -->
+        </exclude-subsystems> 
+		<exclusions>
+			<module name="org.jboss.as.webservices"/> <!-- Excluido el modulo "org.jboss.as.webservices" para eliminar las dependencias con el subsistema "webservice" -->
+			<module name="org.jboss.as.jaxrs"/> <!-- Excluido el modulo "org.jboss.as.jaxrs" para eliminar las dependencias con el subsistema "jaxrs" -->
+			<module name="javaee.api"/> <!-- Excluido el modulo "javaee.api" para eliminar dependencias con la version JAX-RS API de JBOSS -->
+
+			<module name="org.apache.log4j"/>
+		</exclusions>
+		<dependencies>
+			<!-- Una vez excluido el modulo de la API de JAVA, volveremos a cargar todas sus dependencias.
+				 - Deshabilitamos la dependencia del modulo "javax.ws.rs.api", que contiene la API JAX-RS de JBOSS. https://docs.jboss.org/author/display/AS7/Class+Loading+in+AS7 
+				 - Deshabilitamos el modulo "javax.annotation.api" para cargar la libreria con la nueva version 1.2
+			-->
+			<module name="javax.activation.api" export="true"/>
+	        <!-- <module name="javax.annotation.api" export="true"/> -->
+	        <module name="javax.ejb.api" export="true"/>
+	        <module name="javax.el.api" export="true"/>
+	        <module name="javax.enterprise.api" export="true"/>
+	        <module name="javax.enterprise.deploy.api" export="true"/>
+	        <module name="javax.inject.api" export="true"/>
+	        <module name="javax.interceptor.api" export="true"/>
+	        <module name="javax.jms.api" export="true"/>
+	        <module name="javax.jws.api" export="true"/>
+	        <module name="javax.mail.api" export="true"/>
+	        <module name="javax.management.j2ee.api" export="true"/>
+	        <module name="javax.persistence.api" export="true"/>
+	        <module name="javax.resource.api" export="true"/>
+	        <module name="javax.rmi.api" export="true"/>
+	        <module name="javax.security.auth.message.api" export="true"/>
+	        <module name="javax.security.jacc.api" export="true"/>
+	        <module name="javax.servlet.api" export="true"/>
+	        <module name="javax.servlet.jsp.api" export="true"/>
+	        <module name="javax.transaction.api" export="true"/>
+	        <module name="javax.validation.api" export="true"/>
+	        <!-- <module name="javax.ws.rs.api" export="true" services="export"/> -->
+	        <module name="javax.xml.bind.api" export="true"/>
+	        <module name="javax.xml.registry.api" export="true"/>
+	        <module name="javax.xml.soap.api" export="true"/>
+	        <module name="javax.xml.ws.api" export="true"/>
+	        <module name="javax.api" export="true"/>
+	        
+  			<module name="oracle.jdbc.11204" export="true"/>
+		</dependencies>
+	</sub-deployment>
+</jboss-deployment-structure>

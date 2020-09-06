@@ -1,0 +1,1495 @@
+<html>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<head>
+<title>hceservice</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<!-- Generate and retrieve a JavaScript client for the server. -->
+<!-- <script type="text/javascript" src="/hceservice/IServicioGuiaWSService.js"></script> -->
+<script type="text/javascript" src="/hceservice/IServicioHCEWSService.js"></script>
+<script type="text/javascript" src="/hceservice/jquery-1.9.1.js"></script>
+
+<script type="text/javascript">
+
+(function(){
+
+if(!hceservice_hcews){
+	console.error('ERROR: hceservice_hcews not found');
+	return;
+}
+
+})();
+
+//Create an object that talks to the server.
+var server = new hceservice_hcews();
+
+// Set the URL for the service. No cross-scripting allowed. 
+server.url = "/hceservice/hcews?wsdl";
+
+var responseSpan;
+
+function getDummyRS()
+{
+    responseSpan = document.getElementById('resultadoDM');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaDM').val();
+    var url='/hceservice/hcers/getDummy';
+    
+    var params={cia:ciaInput};
+    
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+				value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+    
+}
+
+function getVolantesInterconsultaWS()
+{
+    responseSpan = document.getElementById('resultadoVI');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = document.getElementById('ciaVI');
+    var sectorInput = document.getElementById('sectorVI');
+    
+    server.getVolantesInterconsulta(onsuccessVI,onerrorVI, ciaInput.value, sectorInput.value);
+    return;
+    
+    function onsuccessVI(response){
+    	 var resultado = response.getContenido();
+         var value="";
+         for (var i=0; i<resultado.length; i++) {
+         	value+= resultado[i].getDescripcion()+"<br/>";
+         }
+         responseSpan.innerHTML=value;
+    }
+        
+    function onerrorVI(error){
+        alert('ERROR: ' + error);
+    }
+}
+
+function getVolantesInterconsultaRS()
+{
+    responseSpan = document.getElementById('resultadoVI');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaVI').val();
+    var sectorInput = $('#sectorVI').val();
+    var url='/hceservice/hcers/getVolantesInterconsulta';
+    
+    var params={cia:ciaInput,sector:sectorInput};
+    
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+				value+= response[i].descripcion+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+    
+}
+
+function getContenidoCursoEvolutivoWS()
+{
+    responseSpan = document.getElementById('resultadoCE');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = document.getElementById('ciaCE');
+    var idEpisodioInput = document.getElementById('idEpisodioCE');
+    
+    server.getContenidoCursoEvolutivo(onsuccessCE, onerrorCE, ciaInput.value, idEpisodioInput.value);
+    return;
+    
+    function onsuccessCE(response){
+    	 var resultado = response.getContenido();
+         var value="";
+         for (var i=0; i<resultado.length; i++) {
+         	value+= resultado[i].getNombreParam()+" ";
+         	value+= resultado[i].getValor()+"<br/>";
+         }
+         responseSpan.innerHTML=value;
+    }
+    
+    function onerrorCE(error){
+        alert('ERROR: ' + error);
+    }
+}
+
+function getContenidoCursoEvolutivoRS()
+{
+    responseSpan = document.getElementById('resultadoCE');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaCE').val();
+    var idEpisodioInput = $('#idEpisodioCE').val();
+    var url='/hceservice/hcers/getContenidoCursoEvolutivo';
+    
+    var params={cia:ciaInput,idEpisodio:idEpisodioInput};
+    
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam+" ";
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+    
+}
+
+// function getDatosConsultaSenecaRS()
+// {
+// 	responseSpan = document.getElementById('resultadoCS');
+//     responseSpan.innerHTML = " - espere - ";
+//     var fechaInput = $('#fechaCS').val();
+//     var numAvisoInput = $('#numavisoCS').val();
+//     var codigoAviso = fechaInput + numAvisoInput;
+//     var url='/hceservice/hcers/getDatosConsultaSeneca';
+
+//     var params={codigoAviso:codigoAviso};
+
+//     $.getJSON(url, params, function( response, status, xhr ) {
+// 		if(response){
+// 			var value="";
+// 			for (var i=0; i<response.length; i++) {
+// 	         	value+= response[i].idDatoBasico+" ";
+// 	         	value+= response[i].valor+"<br/>";
+// 			}
+// 			responseSpan.innerHTML=value;
+// 		}else{
+// 			console.error('ERROR: server not sent response');
+// 			return;
+// 		}
+// 	});
+
+// }
+
+function getDatosSeguimientoCartillaEmbarazoRS()
+{
+	responseSpan = document.getElementById('resultadoSCE');
+    responseSpan.innerHTML = ' - espere - ';
+    var ciaInput = $('#ciaSCE').val();
+    var idPlantillaInput = $('#idPlantillaSCE').val();
+    var url='/hceservice/hcers/getDatosSeguimientoCartillaEmbarazo';
+	
+    var params={cia:ciaInput,idPlantilla:idPlantillaInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value = '';
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam + ' ';
+	         	value+= response[i].valor + '<br />';
+			}
+			responseSpan.innerHTML = value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+	
+}
+
+function getDatosConsultaHISRS()
+{
+	responseSpan = document.getElementById('resultadoCH');
+    responseSpan.innerHTML = " - espere - ";
+    var sistOrigenInput = $('#sistOrigenCH').val();
+    var numicuInput = $('#numicuCH').val();
+    var url='/hceservice/hcers/getDatosConsultaHIS';
+	
+    var params={sistOrigen:sistOrigenInput,numicu:numicuInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam+" ";
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+	
+}
+
+function getDatosConsultaMedicacionActivaRS()
+{
+	responseSpan = document.getElementById('resultadoMA');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaMA').val();
+    var url='/hceservice/hcers/getDatosConsultaMedicacionActiva';
+	
+    var params={cia:ciaInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam+" ";
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+	
+}
+
+function getDiagnosticosPorCatalogoRS()
+{
+	responseSpan = document.getElementById('resultadoDPC');
+    responseSpan.innerHTML = " - espere - ";
+    var idCatalogo = $('#idCatalogoDPC').val();
+    var url='/hceservice/hcers/getDiagnosticosPorCatalogo';
+	
+    var params={idCatalogo:idCatalogo};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].idCatalogo+" - ";
+	         	value+= response[i].idCodigo+" - ";
+	         	value+= response[i].descripcion+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+	
+}
+
+function getContenidoReingresoRS()
+{
+	responseSpan = document.getElementById('resultadoR');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaR').val();
+    var idEpisodioInput = $('#idEpisodioR').val();
+    var ucInput = $('#ucR').val();
+    var url='/hceservice/hcers/getContenidoReingreso';
+	
+    var params={cia:ciaInput,idEpisodio:idEpisodioInput,uc:ucInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam+" ";
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+	
+}
+
+function getCitasPendientesYDiasIngresadoPsiquiatriaRS()
+{
+	
+	responseSpan = document.getElementById('resultadoPSQ');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaPSQ').val();
+    var url='/hceservice/hcers/getCitasPendientesYDiasIngresadoPsiquiatria';
+	
+    var params={cia:ciaInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam+" ";
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+	
+}
+
+function getCitasRegistradasRS(){
+	responseSpan = document.getElementById('resultadoPSQReg');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaPSQReg').val();
+    var url='/hceservice/hcers/getCitasRegistradas';
+    
+	var params={cia:ciaInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam+" ";
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+
+function getAgendaHISRehabilitacion()
+{
+	
+	responseSpan = document.getElementById('resultadoRHB');
+    responseSpan.innerHTML = " <tr><td colspan='2' align='center'>- espere -</td></tr> ";
+    var sistOrigenInput = $('#sistOrigenAgendaHISRHB').val();
+    var unidadClinicaInput = $('#unidadClinicaAgendaHISRHB').val();
+    var url='/hceservice/hcers/getAgendaHISRehabilitacion';
+	
+	var params = {
+			sistOrigen : sistOrigenInput,
+			unidadClinica : unidadClinicaInput
+		};
+	
+	$.getJSON(url, params, function(response, status, xhr) {
+		if (response) {
+			var value = "";
+			for (var i = 0; i < response[0].filas.length; i++) {
+				value += "<tr><td>" + response[0].filas[i].codAgenda + "</td>";
+				value += "<td>" + response[0].filas[i].nombreAgenda + "</td></tr>";
+			}
+			responseSpan.innerHTML = value;
+		} else {
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+
+function getDiagnosticoEpisodioIctusRS(){
+	responseSpan = document.getElementById('resultadoDiagEpiIctus');
+    responseSpan.innerHTML = " - espere - ";
+    var centroInput = $('#centroDiagEpiIctus').val();
+    var numicuInput = $('#numicuDiagEpiIctus').val();
+    var url='/hceservice/hcers/getDiagnosticoEpisodioIctus';
+    
+	var params={centro:centroInput,numicu:numicuInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam+" ";
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+
+function getTiemposIctusRS(){
+	responseSpan = document.getElementById('resultadoTiemIctus');
+    responseSpan.innerHTML = " - espere - ";
+    var centroInput = $('#centroTiemIctus').val();
+    var numicuInput = $('#numicuTiemIctus').val();
+    var url='/hceservice/hcers/getTiemposIctus';
+    
+	var params={centro:centroInput,numicu:numicuInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam+" ";
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+
+function getPlanIntervencionRS(){
+	responseSpan = document.getElementById('resultadoPlanIntervencion');
+    responseSpan.innerHTML = ' - espere - ';
+    var ciaInput = $('#ciaPlanIntervencion').val();
+    var idEpisodioInput = $('#idEpisodioPlanIntervencion').val();
+    var ucsInput = $('#ucsPlanIntervencion').val();
+    var url = '/hceservice/hcers/getPlanIntervencion';
+    
+	var params={cia:ciaInput,idEpisodio:idEpisodioInput,ucs:ucsInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value = '';
+			value += response[0].nombreParam + '<br/>';
+			for (var i=0; i<response[0].filas.length; i++) {
+				for (var j=0; j<response[0].filas[i].celdas.length; j++) {
+					var fila = response[0].filas[i];
+					var celda = response[0].filas[i].celdas[j];
+		         	value += fila.idInstanciaFila + ' | ';
+					value += celda.idDatoBasico + ' | ';
+					value += celda.idInstanciaDatoBasico + ' | ';
+					value += celda.columna + ' | ';
+					value += celda.valor + '<br/>';
+				}
+			}
+			
+			responseSpan.innerHTML = value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+function getTiposAlergiasRS(){
+	responseSpan = document.getElementById('resultadoTiposAlergias');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaAlergias').val();
+    var url='/hceservice/hcers/getTiposAlergias';
+    
+	var params={cia:ciaInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+function getTerapiasRhbRS(){
+	responseSpan = document.getElementById('resultadoTerapiasRhb');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaTerapiasRhb').val();
+    var idPlantillaInput = $('#idPlantillaTerapiasRhb').val();
+    var idEpisodioInput = $('#idEpisodioTerapiasRhb').val();
+    var url='/hceservice/hcers/getTerapiasRhb';
+    
+	var params={cia:ciaInput,idPlantilla:idPlantillaInput,idEpisodio:idEpisodioInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam+" ";
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+function getContenidoHojaIngresoObstetriciaRS(){
+	responseSpan = document.getElementById('resultadoContenidoHojaIngresoObstetricia');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaContenidoHojaIngresoObstetricia').val();
+    var centroInput = $('#centroContenidoHojaIngresoObstetricia').val();
+    var numicuInput = $('#numicuContenidoHojaIngresoObstetricia').val();
+    var url='/hceservice/hcers/getContenidoHojaIngresoObstetricia';
+    
+	var params={cia:ciaInput,centro:centroInput,numicu:numicuInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam+" ";
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+function getContenidoValoracionRS(){
+	responseSpan = document.getElementById('resultadoContenidoValoracion');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaValoracion').val();
+    var idInstPlantillaInput = $('#idInstPlantilla').val();
+    var url='/hceservice/hcers/getContenidoValoracion';
+    
+	var params={cia: ciaInput, idInstPlantilla: idInstPlantillaInput};
+	
+	 $.getJSON(url, params, function( response, status, xhr ) {
+			if(response){
+				var value="";
+				for (var i=0; i<response.length; i++) {
+		         	value+= response[i].nombreParam+" ";
+		         	value+= response[i].valor+"<br/>";
+				}
+				responseSpan.innerHTML=value;
+			}else{
+				console.error('ERROR: server not sent response');
+				return;
+			}
+	});
+}
+
+function getCriteriosExclusionIctusRS(){
+	responseSpan = document.getElementById('resultadoCriteriosExclusion');
+    responseSpan.innerHTML = " - espere - ";
+    var centroInput = $('#centroCriteriosExclusionIctus').val();
+    var numicuInput = $('#numicuCriteriosExclusionIctus').val();
+    var url='/hceservice/hcers/getCriteriosExclusionIctus';
+    
+	var params={centro:centroInput,numicu:numicuInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam+" ";
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+
+function getContenidoCuidadosEnfermeriaRS()
+{
+    responseSpan = document.getElementById('resultadoCEnf');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaCEnf').val();
+    var idEpisodioInput = $('#idEpisodioCEnf').val();
+    var url='/hceservice/hcers/getContenidoCuidadosEnfermeria';
+    
+    var params={cia:ciaInput,idEpisodio:idEpisodioInput};
+    
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].nombreParam+" ";
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+    
+}
+
+function getPeticionesElectronicas(){
+	responseSpan = document.getElementById('resultadoPeticionesElectronicas');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaPeticionesElectronicas').val();
+    var numicuInput = $('#numicuPeticionesElectronicas').val();
+    var url='/hceservice/hcers/getPeticionesElectronicas';
+    
+	var params={cia:ciaInput,numicu:numicuInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+
+function getPrescripciones(){
+	responseSpan = document.getElementById('resultadoPrescripciones');
+    responseSpan.innerHTML = " - espere - ";
+    var ucInput = $('#ucPrescripciones').val();
+    var nhcInput = $('#nhcPrescripciones').val();
+    var url='/hceservice/hcers/getPrescripciones';
+    
+	var params={ucSeleccionada:ucInput,
+				nhc:nhcInput
+				};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+
+function getReaccionesAdversas(){
+	responseSpan = document.getElementById('resultadoRam');
+    responseSpan.innerHTML = " - espere - ";
+    var ciaInput = $('#ciaRam').val();
+    var url='/hceservice/hcers/getReaccionesAdversas';
+    
+	var params={cia:ciaInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+
+function getNumPetiGIPEByNHCAndNumicu(){
+	responseSpan = document.getElementById('resultadoNumPetiGIPE');
+    responseSpan.innerHTML = " - espere - ";
+    var centroInput = $('#centroNumPetiGIPE').val();
+    var nhcInput = $('#nhcNumPetiGIPE').val();
+    var numicuInput = $('#numicuNumPetiGIPE').val();
+    var url='/hceservice/hcers/getNumPetiGIPEByNHCAndNumicu';
+    
+	var params={centro:centroInput,nhc:nhcInput,numicu:numicuInput};
+	
+    $.getJSON(url, params, function( response, status, xhr ) {
+		if(response){
+			var value="";
+			for (var i=0; i<response.length; i++) {
+	         	value+= response[i].valor+"<br/>";
+			}
+			responseSpan.innerHTML=value;
+		}else{
+			console.error('ERROR: server not sent response');
+			return;
+		}
+	});
+}
+
+</script>
+</head>
+
+<body>
+<h1>
+TEST hceservice {WS || RS}
+</h1>
+<hr/>
+<form>
+<div>
+	<table>
+	<tr>
+		<td>
+			getDummy
+		</td>
+		<td>
+			CIA: <input id="ciaDM" type="text"/> 
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getDummyRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoDM'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getVolantesInterconsulta
+		</td>
+		<td>
+			CIA: <input id="ciaVI" type="text"/> 
+			Sector: <input id="sectorVI" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeWS" name="categoryQuery" onClick="getVolantesInterconsultaWS()">
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getVolantesInterconsultaRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoVI'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getContenidoCursoEvolutivo
+		</td>
+		<td>
+			CIA: <input id="ciaCE" type="text"/> 
+			idEpisodio: <input id="idEpisodioCE" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeWS" name="categoryQuery" onClick="getContenidoCursoEvolutivoWS()">
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getContenidoCursoEvolutivoRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoCE'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getDatosConsultaSeneca
+		</td>
+		<td>
+<!-- 			Fecha: <input id="fechaCS" type="text"/> -->
+<!-- 			Num. Aviso: <input id="numavisoCS" type="text"/> -->
+			| En estos momentos, no es posible llamar a Seneca desde esta web
+		</td>
+	</tr>
+	<tr>
+	    <td>
+<!-- 	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getDatosConsultaSenecaRS()"> -->
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoCS'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getDatosSeguimientoCartillaEmbarazo
+		</td>
+		<td>
+			CIA: <input id="ciaSCE" type="text"/>
+			idPlantilla:  <input id="idPlantillaSCE" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getDatosSeguimientoCartillaEmbarazoRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoSCE'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getDatosConsultaHIS
+		</td>
+		<td>
+			SistOrigen: <input id="sistOrigenCH" type="text"/>
+			Numicu: <input id="numicuCH" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getDatosConsultaHISRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoCH'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getDatosConsultaMedicacionActiva
+		</td>
+		<td>
+			CIA: <input id="ciaMA" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getDatosConsultaMedicacionActivaRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoMA'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getDiagnosticosPorCatalogoRS
+		</td>
+		<td>
+			idCatalogo: <input id="idCatalogoDPC" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getDiagnosticosPorCatalogoRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td style="vertical-align: top;">
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoDPC'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getContenidoReingreso
+		</td>
+		<td>
+			CIA: <input id="ciaR" type="text"/>
+			idEpisodio: <input id="idEpisodioR" type="text"/>
+			UC: <input id="ucR" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getContenidoReingresoRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoR'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getCitasPendientesYDiasIngresadoPsiquiatria
+		</td>
+		<td>
+			CIA: <input id="ciaPSQ" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getCitasPendientesYDiasIngresadoPsiquiatriaRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoPSQ'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getCitasRegistradas
+		</td>
+		<td>
+			CIA: <input id="ciaPSQReg" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getCitasRegistradasRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoPSQReg'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getAgendaHISRehabilitacion
+		</td>
+		<td>
+			sistOrigen: <input id="sistOrigenAgendaHISRHB" type="text"/>
+			unidadClinica: <input id="unidadClinicaAgendaHISRHB" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getAgendaHISRehabilitacion()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<table border="1">	
+				<tr>
+					<th>codAgenda</th>
+					<th>nombreAgenda</th>
+				</tr>
+				<tbody id='resultadoRHB'>
+					<tr>
+						<td colspan="2" align="center">- not yet invoked -</td>
+					</tr>
+				</tbody>
+			</table>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getDiagnosticoEpisodioIctus
+		</td>
+		<td>
+			Centro: <input id="centroDiagEpiIctus" type="text"/>
+			Numicu: <input id="numicuDiagEpiIctus" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getDiagnosticoEpisodioIctusRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoDiagEpiIctus'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getTiemposIctus
+		</td>
+		<td>
+			Centro: <input id="centroTiemIctus" type="text"/>
+			Numicu: <input id="numicuTiemIctus" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getTiemposIctusRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoTiemIctus'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getPlanIntervencion
+		</td>
+		<td>
+			CIA: <input id="ciaPlanIntervencion" type="text"/>
+			idEpisodio: <input id="idEpisodioPlanIntervencion" type="text"/>
+			ucs: <input id="ucsPlanIntervencion" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getPlanIntervencionRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoPlanIntervencion'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getTiposAlergias
+		</td>
+		<td>
+			Cia: <input id="ciaAlergias" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getTiposAlergiasRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoTiposAlergias'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getTerapiasRhb
+		</td>
+		<td>
+			cia: <input id="ciaTerapiasRhb" type="text"/>
+			idPlantilla: <input id="idPlantillaTerapiasRhb" type="text"/>
+			idEpisodio: <input id="idEpisodioTerapiasRhb" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getTerapiasRhbRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoTerapiasRhb'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getContenidoHojaIngresoObstetricia
+		</td>
+		<td>
+			cia: <input id="ciaContenidoHojaIngresoObstetricia" type="text"/>
+			centro: <input id="centroContenidoHojaIngresoObstetricia" type="text"/>
+			numicu: <input id="numicuContenidoHojaIngresoObstetricia" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getContenidoHojaIngresoObstetriciaRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoContenidoHojaIngresoObstetricia'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getContenidoValoracion
+		</td>
+		<td>
+			Cia: <input id="ciaValoracion" type="text"/>
+			idInstPlantilla: <input id="idInstPlantilla" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getContenidoValoracionRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoContenidoValoracion'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getCriteriosExclusionIctus
+		</td>
+		<td>
+			Centro: <input id="centroCriteriosExclusionIctus" type="text"/>
+			Numicu: <input id="numicuCriteriosExclusionIctus" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getCriteriosExclusionIctusRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoCriteriosExclusionIctus'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getContenidoCuidadosEnfermeria
+		</td>
+		<td>
+			CIA: <input id="ciaCEnf" type="text"/> 
+			idEpisodio: <input id="idEpisodioCEnf" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getContenidoCuidadosEnfermeriaRS()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoCEnf'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getPeticionesElectronicas
+		</td>
+		<td>
+			CIA: <input id="ciaPeticionesElectronicas" type="text"/> 
+			Numicu: <input id="numicuPeticionesElectronicas" type="text"/> 
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getPeticionesElectronicas()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoPeticionesElectronicas'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getPrescripciones
+		</td>
+		<td>
+			UC: <input id="ucPrescripciones" type="text"/>
+			NHC: <input id="nhcPrescripciones" type="text">
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getPrescripciones()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoPrescripciones'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getReaccionesAdversas
+		</td>
+		<td>
+			CIA: <input id="ciaRam" type="text"/>
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getReaccionesAdversas()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoRam'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+<hr/>
+<div>
+	<table>
+	<tr>
+		<td>
+			getNumPetiGIPEByNHCAndNumicu
+		</td>
+		<td>
+			Centro: <input id="centroNumPetiGIPE" type="text" />
+			NHC: <input id="nhcNumPetiGIPE" type="text" />
+			Numicu: <input id="numicuNumPetiGIPE" type="text" />
+		</td>
+	</tr>
+	<tr>
+	    <td>
+	    	<input type="button" value="invokeRS" name="categoryQuery" onClick="getNumPetiGIPEByNHCAndNumicu()">
+	    </td>
+	    <td>
+	    	&nbsp;
+	    </td>
+	</tr>
+	<tr>
+		<td>
+			Resultado
+		</td>
+		<td>
+			<span id='resultadoNumPetiGIPE'>- not yet invoked -</span>
+		</td>
+	</tr>
+	</table>
+</div>
+</form>
+</body>
+</html>

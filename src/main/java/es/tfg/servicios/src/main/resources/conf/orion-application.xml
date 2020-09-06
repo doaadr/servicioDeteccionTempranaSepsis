@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<orion-application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://xmlns.oracle.com/oracleas/schema/orion-application-10_0.xsd">
+	<imported-shared-libraries>
+		<import-shared-library name="Xerces" min-version="2.5" max-version="2.5"/>
+		<remove-inherited name="oracle.xml"/>
+		<remove-inherited name="oracle.jwsdl"/>
+		<remove-inherited name="oracle.ws.client"/>
+		<remove-inherited name="oracle.ws.jaxrpc"/>
+		<remove-inherited name="oracle.xml.security"/>
+		<remove-inherited name="soap"/>
+	</imported-shared-libraries>
+</orion-application>

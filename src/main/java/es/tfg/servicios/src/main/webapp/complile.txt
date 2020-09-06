@@ -1,0 +1,3 @@
+antes de ejecutar borrar los antiguos /dist y /build y luego lanzar un ant dist
+
+C:\Users\msunenla\Desktop\apache-cxf-3.0.2\apache-cxf-3.0.2\bin\java2js -jsutils -cp "C:\PROYECTOS\SALUD\HCE\workspace\HCE\apps\hceservice\build\classes" es.aragon.salud.servicios.IServicioHCEWS

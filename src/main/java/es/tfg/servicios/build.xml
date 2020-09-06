@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="HCEService" default="dist" basedir=".">
+	<!-- TASKDEF para tareas CONDICIONALES -->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+
+	<target name="init">
+		<property environment="env"/> 
+		<property name="src.dir" value="src/main/java/" />
+		<property name="conf.dir" value="src/main/resources/conf/" />
+		<property name="web.dir" value="src/main/webapp"/>
+		<property name="libhce.dir" value="../../lib" />
+		<property name="lib.dir" value="lib" />
+		<property name="components.dir" value="../../components" />
+		<property name="classpath" value="
+				${lib.dir}/javax.ws.rs-api-2.0.jar;
+				${libhce.dir}/commons-collections.jar;
+				${libhce.dir}/commons-lang-2.4.jar;
+				${libhce.dir}/gson-2.2.2.jar;
+				${libhce.dir}/gson-fire-0.9.0.jar;
+				${libhce.dir}/log4j-1.2.15.jar;
+				${libhce.dir}/ojdbc6.jar;
+				${libhce.dir}/vtd-xml.jar;
+				${components.dir}/hce_utils/dist/hce_utils.jar;
+				${components.dir}/hce_guia_utils/dist/hce_guia_utils.jar;
+				${components.dir}/hce_common_beans/dist/hce_common_beans.jar;
+
+			"/>
+		<property name="build.dir" value="build" />
+		<property name="dist.dir" value="dist" />
+	</target>
+
+	<target name="entorno" depends="init">
+		<if>
+			<and>
+				<not><equals arg1="${entorno}" arg2="des"/></not>
+				<not><equals arg1="${entorno}" arg2="pre"/></not>
+				<not><equals arg1="${entorno}" arg2="pro"/></not>
+			</and>
+			<then>
+				<echo message="ERROR: valor ENTORNO no valido: -Dentorno [pro|pre|des]" />
+				<fail/>
+			 </then>
+		</if>		
+	</target>
+	
+	<target name="prepare" depends="entorno">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.dir}/checkstyle"/>
+		<mkdir dir="${build.dir}/classes"/>
+		<mkdir dir="${build.dir}/war"/>
+		<mkdir dir="${build.dir}/war/WEB-INF"/>
+		<mkdir dir="${build.dir}/war/WEB-INF/lib"/>
+		<mkdir dir="${build.dir}/war/WEB-INF/classes"/>
+		<mkdir dir="${build.dir}/war/WEB-INF/classes/conf"/>
+		<mkdir dir="${build.dir}/war/WEB-INF/classes/conf/cxf"/>
+		<mkdir dir="${build.dir}/war/META-INF"/>
+		<mkdir dir="${build.dir}/war/META-INF/cxf"/>
+		<mkdir dir="${build.dir}/ear"/>
+		<mkdir dir="${build.dir}/ear/META-INF"/>
+		<mkdir dir="${dist.dir}" />
+ 	</target>
+	
+	<!-- Tarea para compilar las clases -->
+	<target name="compilaClases" depends="prepare, genera_common_beans">
+		<!-- Compilamos las clases y las dejamos en el directorio BUILD/CLASSES -->
+		<!-- debug="true"	--> 
+		<javac srcdir="${src.dir}" 
+			includeAntRuntime="false" 
+			destdir="${build.dir}/classes" 
+			classpath="${classpath}"
+			debug="true">
+		</javac>
+	</target>	
+
+	<target name="generaWar" depends="compilaClases, genera_guia_utils, genera_utils">
+		<!-- Copiamos los ficheros CLASS para generar el WAR  -->
+		<copy todir="${build.dir}/war/WEB-INF/classes">
+			<fileset dir="${build.dir}/classes"/>
+		</copy>
+		<!-- Copiamos los resources del classpath  -->
+		<copy todir="${build.dir}/war/WEB-INF/classes">
+			<fileset dir="${src.dir}" casesensitive="yes">
+			  <exclude name="**/*.java"/>
+			</fileset>
+		</copy>
+
+		<!-- Copiamos las dependencias de mvn en el WAR  -->
+		<copy file="${lib.dir}/asm-3.3.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-core-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-bindings-soap-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-bindings-xml-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-databinding-jaxb-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-frontend-jaxrs-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-frontend-jaxws-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-frontend-simple-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-javascript-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-rs-extension-providers-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-rs-service-description-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-transports-http-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-ws-addr-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-ws-policy-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/cxf-rt-wsdl-3.0.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/javax.annotation-api-1.2.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/javax.ws.rs-api-2.0.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/neethi-3.0.3.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/spring-aop-3.1.3.RELEASE.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/spring-asm-3.1.3.RELEASE.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/spring-beans-3.1.3.RELEASE.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/spring-context-3.1.3.RELEASE.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/spring-core-3.1.3.RELEASE.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/spring-expression-3.1.3.RELEASE.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/spring-web-3.1.3.RELEASE.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/wsdl4j-1.6.3.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/xmlschema-core-2.1.0.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		
+		
+		<!-- Copiamos las librerias en el WAR  -->
+		<copy file="${lib.dir}/cors-filter-1.9.3.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${lib.dir}/java-property-utils-1.9.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<!--<copy file="${libhce.dir}/commons-lang3-3.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>-->
+		<copy file="${libhce.dir}/log4j-1.2.15.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${libhce.dir}/gson-2.2.2.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${libhce.dir}/gson-fire-0.9.0.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${libhce.dir}/vtd-xml.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		
+		<!-- Librerias de COMPONENTES: BEANs usados los servicios JSON, utilidades y accesos a GUIA -->
+		<!-- FIXME: 
+				REVISAR SI SON NECESARIAS TODAS ESTAS LIBRERIAS - No están en el CLASSPATH para compilar 
+		-->
+		<copy file="${libhce.dir}/jersey-client-1.9.1.jar" todir="${build.dir}/war/WEB-INF/lib" />
+		<copy file="${libhce.dir}/jersey-core-1.9.1.jar" todir="${build.dir}/war/WEB-INF/lib" />
+		<copy file="${libhce.dir}/commons-collections.jar" todir="${build.dir}/war/WEB-INF/lib" />
+		<copy file="${libhce.dir}/commons-lang-2.4.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${libhce.dir}/httpcore-4.2.4.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${libhce.dir}/httpclient-4.2.5.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${libhce.dir}/commons-logging-1.1.1.jar" todir="${build.dir}/war/WEB-INF/lib"/>
+		<copy file="${components.dir}/hce_utils/dist/hce_utils.jar" todir="${build.dir}/war/WEB-INF/lib" />
+		<copy file="${components.dir}/hce_guia_utils/dist/hce_guia_utils.jar" todir="${build.dir}/war/WEB-INF/lib" />
+		<copy file="${components.dir}/hce_common_beans/dist/hce_common_beans.jar" todir="${build.dir}/war/WEB-INF/lib" />
+
+		<!-- Copiamos el fichero PROBE.JSP que corresponda con el sector -->
+<!--		<copy file="${web.dir}/probe.jsp.${sector}.${entorno}" tofile="${build.dir}/war/probe.jsp" overwrite="true"/>
+		<copy file="${web.dir}/probe1.jsp.${sector}.${entorno}" tofile="${build.dir}/war/probe1.jsp" failonerror="false" overwrite="true"/>
+		<copy file="${web.dir}/probe1nuevo.jsp.${sector}.${entorno}" tofile="${build.dir}/war/probe1nuevo.jsp" failonerror="false" overwrite="true"/>
+		<copy file="${web.dir}/probe2.jsp.${sector}.${entorno}" tofile="${build.dir}/war/probe2.jsp" failonerror="false" overwrite="true"/>
+		<copy file="${web.dir}/probe3.jsp.${sector}.${entorno}" tofile="${build.dir}/war/probe3.jsp" failonerror="false" overwrite="true"/> -->
+		
+		<!-- Copiamos los ficheros JSP -->
+		<copy todir="${build.dir}/war">
+			<fileset dir="${web.dir}">
+				<include name="**/*.jsp"/>
+				<include name="**/*.html"/>
+				<include name="**/*.js"/>
+			</fileset>
+		</copy>
+		
+		<!-- Copiamos los ficheros de configuracion de CXF-->
+		<copy file="${conf.dir}/cxf/cxf.xml" todir="${build.dir}/war/WEB-INF/classes/conf/cxf"/>
+		<copy file="${web.dir}/WEB-INF/application-config-soap.xml" todir="${build.dir}/war/WEB-INF"/>
+
+		<!-- Copiamos el fichero de properties de Log4J-->
+		<copy verbose="yes" file="${conf.dir}/cxf/org.apache.cxf.Logger" todir="${build.dir}/war/META-INF/cxf"/>
+		<copy verbose="yes" file="${conf.dir}/log4j.properties.${entorno}" tofile="${build.dir}/war/WEB-INF/classes/log4j.properties"/>
+
+		<!-- Copiamos el fichero de properties General -->
+		<copy file="${conf.dir}/configuration.properties.${entorno}" tofile="${build.dir}/war/WEB-INF/classes/configuration.properties" />
+		<copy file="${conf.dir}/kodifika.properties" tofile="${build.dir}/war/WEB-INF/classes/kodifika.properties" />
+		<copy file="${conf.dir}/consultaRAIMServer.properties" tofile="${build.dir}/war/WEB-INF/classes/consultaRAIMServer.properties" />
+
+		<!-- Copiamos el fichero de properties ClienteGUIA -->
+		<copy file="${conf.dir}/ClienteGUIA.properties.${entorno}" tofile="${build.dir}/war/WEB-INF/classes/ClienteGUIA.properties" />
+		
+		<!-- Copiamos el fichero de properties de OMI -->
+		<copy verbose="yes" file="${conf.dir}/configurationomi.properties.${entorno}" tofile="${build.dir}/war/WEB-INF/classes/configurationomi.properties" />
+		
+		<!-- Copiamos el fichero de properties de Seneca -->
+		<copy verbose="yes" file="${conf.dir}/consultaseneca.properties.${entorno}" tofile="${build.dir}/war/WEB-INF/classes/consultaseneca.properties" />
+		
+		<!-- Copiamos los ficheros properties de HIS -->
+		<copy verbose="yes" file="${conf.dir}/configurationhis.properties.${entorno}" tofile="${build.dir}/war/WEB-INF/classes/configurationhis.properties" />
+		<copy verbose="yes" file="${conf.dir}/consultahis.properties.${entorno}" tofile="${build.dir}/war/WEB-INF/classes/consultahis.properties" />
+		
+		<!-- Copiamos el fichero de properties de messages -->
+		<copy verbose="yes" file="${conf.dir}/messages.properties" tofile="${build.dir}/war/WEB-INF/classes/messages.properties" />
+		
+		<!-- Generamos el WAR con todo el contenido del directorio -->
+		<war destfile="${build.dir}/ear/hceservice.war" webxml="${web.dir}/WEB-INF/web.xml" >
+			<fileset dir="${build.dir}/war"/>
+		</war>
+	
+	</target>
+
+	<!-- Tarea para generar los COMMON UTILS -->
+	<target name="genera_utils" depends="prepare,entorno">
+		<!-- Llamamos al ANT anidado -->
+		<ant antfile="${components.dir}/hce_utils/build.xml"
+				inheritAll="false"
+				target="dist" />
+	</target>
+
+	<!-- Tarea para generar los COMMON GUIA UTILS -->
+	<target name="genera_guia_utils" depends="genera_utils">
+		<!-- Llamamos al ANT anidado -->
+		<ant antfile="${components.dir}/hce_guia_utils/build.xml"
+				inheritAll="false"
+				target="dist" />
+	</target>
+
+	<!-- Tarea para generar los COMMON BEANS -->
+	<target name="genera_common_beans" depends="genera_guia_utils">
+		<!-- Llamamos al ANT anidado -->
+		<ant antfile="${components.dir}/hce_common_beans/build.xml"
+				inheritAll="false"
+				target="dist" />
+	</target>
+
+	<!-- Tarea DIST para generar el EAR -->
+	<target name="genera_ear" depends="entorno">
+		<!-- Generamos el WAR -->
+		<antcall target="generaWar"/>
+
+		<!-- Copiamos los ficheros de configuracion necesarios -->				
+		<copy verbose="yes" file="${conf.dir}/jboss-deployment-structure.xml" todir="${build.dir}/ear/META-INF"/>
+		
+		<!-- Generamos el EAR -->
+		<ear destfile="${dist.dir}/hceservice.ear" appxml="${conf.dir}/application.xml" >
+			<fileset dir="${build.dir}/ear"/>
+			<metainf dir="${conf.dir}">
+				<include name="**/MANIFEST.MF" />
+			</metainf>		
+		</ear>
+	</target>
+
+	<target name="deploy">
+		<!-- Copiamos el EAR al directorio de despliegue de JBOSS  -->
+		<copy file="${dist.dir}/hceservice.ear" todir="${env.JBOSS_HOME}/standalone/deployments" />
+	</target>
+	
+	<target name="dist" depends="genera_ear">
+		<if>
+			<or>
+				<equals arg1="${entorno}" arg2="des"/><!--no existe local-->
+				<not><equals arg1="${env.DEPLOY_ENTREGA}" arg2="false"/></not>
+			</or>
+			<then>
+				<antcall target="deploy"/>
+			</then>
+		</if>
+	</target>
+
+	<!-- Tarea CLEAN de dist -->
+	<target name="cleanDist" depends="init" description="Borrar directorios temporales">  
+		<delete dir="${build.dir}" />  
+		<delete dir="${dist.dir}" />
+	</target> 
+
+	<!-- Tarea CLEAN para limpieza del proyecto -->
+	<target name="clean" depends="init" description="Borrar directorios temporales">  
+		<delete includeemptydirs="true"><fileset dir="bin" includes="**/*" erroronmissingdir="false"/></delete>
+		<delete includeemptydirs="true"><fileset dir="${build.dir}" includes="**/*" erroronmissingdir="false"/></delete>
+		<delete includeemptydirs="true"><fileset dir="${dist.dir}" includes="**/*" erroronmissingdir="false"/></delete>
+	</target> 
+
+	<!-- ============================================ -->
+	<!--          Comprobación de CHECKSTYLE          -->
+	<!-- ============================================ -->
+	<target name="checkstyle" depends="prepare">
+		<echo>Realizando comprobación de Javadoc</echo>
+		<!-- Definimos la tarea para CHECKSTYLE -->
+		<taskdef resource="checkstyletask.properties" classpath="${libhce.dir}/checkstyle-5.7-all.jar"/>
+		<!-- Ejecutamos la tarea -->
+		<checkstyle config="${libhce.dir}/checkstyle/cgipc-checks.xml" maxErrors="10000">
+			<fileset dir="src/main/java" includes="**/*.java"/>
+			<formatter type="xml" toFile="${build.dir}/checkstyle/checkstyle_errors.xml"/>
+		</checkstyle>
+		<!-- Formateamos la salida -->
+		<replace file="${build.dir}/checkstyle/checkstyle_errors.xml" token="${basedir}" value=""/> 
+		<replace file="${build.dir}/checkstyle/checkstyle_errors.xml" token="\src\java\" value=""/> 
+		<xslt in="${build.dir}/checkstyle/checkstyle_errors.xml" 
+			  out="${build.dir}/checkstyle/resultado.html" 		
+			  style="${libhce.dir}/checkstyle/checkstyle-simple.xsl"
+			  force="true"/>
+	</target>
+</project>
